@@ -1,13 +1,14 @@
 .. image:: https://secure.travis-ci.org/yourlabs/django-cities-light.png?branch=master
 
-django-cities-light -- *Simple django-cities alternative*
+django-cities-light-with-population -- *django-cities-light alternative to include population*
 =========================================================
 
 This add-on provides models and commands to import country, region/state, and
 city data in your database.
 
 The data is pulled from `GeoNames
-<http://www.geonames.org/>`_ and contains cities, regions/states and countries.
+<http://www.geonames.org/>`_ and contains population cities, regions/states and countries.
+** Not all data will work **
 
 Spatial query support is not required by this application.
 
@@ -17,6 +18,8 @@ database, you should use
 `django-cities
 <https://github.com/coderholic/django-cities>`_.
 
+Unless you absolutely must need population, use django-cities-light instead
+
 Upgrade
 -------
 
@@ -25,22 +28,7 @@ See CHANGELOG.
 Installation
 ------------
 
-Install django-cities-light::
-
-    pip install django-cities-light
-
-Or the development version::
-
-    pip install -e git+git@github.com:yourlabs/django-cities-light.git#egg=cities_light
-
-Add `cities_light` to your `INSTALLED_APPS`.
-
-Now, run syncdb, it will only create tables for models that are not disabled::
-
-    ./manage.py syncdb
-
-Note that this project supports django-south. It is recommended that you use
-south too else you're on your own for migrations/upgrades.
+see django-cities-light
 
 Data update
 -----------

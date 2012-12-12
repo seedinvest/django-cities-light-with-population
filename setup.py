@@ -9,10 +9,10 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name='django-cities-light',
+    name='django-cities-light-with-population',
     version='2.0.7',
-    description='Simple alternative to django-cities',
-    author='James Pic',
+    description='Based on django-cities-light but relies on population, will not work with geoname files that do not have population',
+    author='SeedInvest',
     author_email='jamespic@gmail.com',
     url='https://github.com/yourlabs/django-cities-light',
     packages=find_packages(),

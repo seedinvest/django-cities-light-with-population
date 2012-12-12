@@ -328,6 +328,10 @@ It is possible to force the import of files which weren't downloaded using the
             city.geoname_id = items[0]
             save = True
 
+        if not city.population:
+            city.population = items[14]
+            save = True
+
         if save:
             city.save()
 
