@@ -332,7 +332,7 @@ It is possible to force the import of files which weren't downloaded using the
             city.population = items[14]
             save = True
 
-        if save:
+        if save and items[6] == 'P': #only import cities, villages, etc
             city.save()
 
     def translation_parse(self, items):
