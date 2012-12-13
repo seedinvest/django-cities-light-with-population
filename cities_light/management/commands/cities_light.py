@@ -134,6 +134,7 @@ It is possible to force the import of files which weren't downloaded using the
                     widgets=self.widgets)
 
                 for items in geonames.parse():
+                    self.logger.info('trying line for %s' % items[2])
                     if url in CITY_SOURCES:
                         self.city_import(items)
                     elif url in REGION_SOURCES:
@@ -303,6 +304,7 @@ It is possible to force the import of files which weren't downloaded using the
             try:
                 city.region_id = self._get_region_id(items[8], items[10])
             except Region.DoesNotExist:
+                self.logger.info('region id does not exist for %s' % items[2])
                 pass
             else:
                 save = True
@@ -330,6 +332,14 @@ It is possible to force the import of files which weren't downloaded using the
 
         if not city.population:
             city.population = items[14]
+            save = True
+
+        if not city.feature_class:
+            city.feature_class = items[6]
+            save = True
+
+        if not city.feature_code:
+            city.feature_code = items[7]
             save = True
 
         if save and items[6] == 'P': #only import cities, villages, etc
