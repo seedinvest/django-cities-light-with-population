@@ -288,24 +288,25 @@ It is possible to force the import of files which weren't downloaded using the
         if items[0] == '5141502': # special case debug for troy NY
             self.logger.info('found troy, debugging starts')
 
-        try:
-            city = City.objects.get(**kwargs)
-        except City.DoesNotExist:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city does not exist with kwargs')
-            try:
-                city = City.objects.get(geoname_id=items[0])
-                city.name = force_unicode(items[1])
-                city.country_id = self._get_country_id(items[8])
-            except City.DoesNotExist:
-                if items[0] == '5141502': # special case debug for troy NY
-                    self.logger.info('city does not exist with geoname_id, etc, using memory')
-                if self.noinsert:
-                    return
+        if not items[6] == 'P': # only import actual cities
+            return
 
-                city = City(**kwargs)
-                if items[0] == '5141502': # special case debug for troy NY
-                    self.logger.info('city created in memory ')
+        try:
+            city = City.objects.get(geoname_id=items[0])
+        except City.DoesNotExist:
+            #if items[0] == '5141502': # special case debug for troy NY
+            #    self.logger.info('city does not exist with kwargs')
+            #try:
+            #    city = City.objects.get(**kwargs)
+            #except City.DoesNotExist:
+            #    if items[0] == '5141502': # special case debug for troy NY
+            #        self.logger.info('city does not exist with geoname_id, etc, using memory')
+            if self.noinsert:
+                return
+
+            city = City(**kwargs)
+            if items[0] == '5141502': # special case debug for troy NY
+                self.logger.info('city created in memory ')
 
         save = False
         if not city.region_id:
@@ -373,7 +374,7 @@ It is possible to force the import of files which weren't downloaded using the
 
         if items[0] == '5141502': # special case debug for troy NY
             self.logger.info('save is: %s and items[6] is %s' % (save, items[6]))
-        if save and items[6] == 'P': #only import cities, villages, etc
+        if save: #only import cities, villages, etc
             if items[0] == '5141502': # special case debug for troy NY
                 self.logger.info('saving troy')
             city.save()
