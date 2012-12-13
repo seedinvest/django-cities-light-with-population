@@ -285,33 +285,16 @@ It is possible to force the import of files which weren't downloaded using the
             else:
                 raise
 
-        if items[0] == '5141502': # special case debug for troy NY
-            self.logger.info('found troy, debugging starts')
-
-        if not items[6] == 'P': # only import actual cities
-            return
-
         try:
             city = City.objects.get(geoname_id=items[0])
         except City.DoesNotExist:
-            #if items[0] == '5141502': # special case debug for troy NY
-            #    self.logger.info('city does not exist with kwargs')
-            #try:
-            #    city = City.objects.get(**kwargs)
-            #except City.DoesNotExist:
-            #    if items[0] == '5141502': # special case debug for troy NY
-            #        self.logger.info('city does not exist with geoname_id, etc, using memory')
             if self.noinsert:
                 return
 
             city = City(**kwargs)
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city created in memory ')
 
         save = False
         if not city.region_id:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city has no region id ')
             try:
                 city.region_id = self._get_region_id(items[8], items[10])
             except Region.DoesNotExist:
@@ -321,65 +304,41 @@ It is possible to force the import of files which weren't downloaded using the
                 save = True
 
         if not city.name_ascii:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city has no name_ascii')
             # useful for cities with chinese names
             city.name_ascii = items[2]
             save = True
 
         if not city.latitude:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city has no latitude')
             city.latitude = items[4]
             save = True
 
         if not city.longitude:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city has no longitude')
             city.longitude = items[5]
             save = True
 
         if not TRANSLATION_SOURCES and not city.alternate_names:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city has no alternate_names')
             city.alternate_names = force_unicode(items[3])
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('alternate name forced unicode successfully')
             save = True
 
         if not city.geoname_id:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city has no geoname_id')
             # city may have been added manually
             city.geoname_id = items[0]
             save = True
 
         if not city.population:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city has no population')
             city.population = items[14]
             save = True
 
         if not city.feature_class:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city has no feature_class')
             city.feature_class = items[6]
             save = True
 
         if not city.feature_code:
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('city has no feature_code')
             city.feature_code = items[7]
             save = True
 
-        if items[0] == '5141502': # special case debug for troy NY
-            self.logger.info('save is: %s and items[6] is %s' % (save, items[6]))
-        if save: #only import cities, villages, etc
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('saving troy')
+        if save:
             city.save()
-            if items[0] == '5141502': # special case debug for troy NY
-                self.logger.info('troy is saved')
 
     def translation_parse(self, items):
         if not hasattr(self, 'translation_data'):
