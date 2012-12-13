@@ -173,7 +173,7 @@ class City(Base):
     country = models.ForeignKey(Country)
 
     class Meta:
-        unique_together = (('region', 'name'),)
+        unique_together = (('region', 'name', 'feature_class', 'feature_code'),)
         verbose_name_plural = _(u'cities')
 
     def get_display_name(self):
