@@ -66,7 +66,7 @@ TRANSLATION_LANGUAGES = getattr(settings, 'CITIES_LIGHT_TRANSLATION_LANGUAGES',
     ['es', 'en', 'pt', 'de', 'pl', 'abbr'])
 
 SOURCES = list(COUNTRY_SOURCES) + list(REGION_SOURCES) + list(CITY_SOURCES)
-SOURCES += TRANSLATION_SOURCES
+#SOURCES += TRANSLATION_SOURCES
 
 DATA_DIR = getattr(settings, 'CITIES_LIGHT_DATA_DIR',
     os.path.normpath(os.path.join(

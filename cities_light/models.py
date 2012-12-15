@@ -150,6 +150,10 @@ class ToSearchTextField(models.TextField):
         return (field_class, args, kwargs)
 
 
+class City_Name_Prefix(models.Model):
+    prefix = models.CharField(max_length=200, db_index=True, unique=True)
+
+
 class City(Base):
     """
     City model.
@@ -158,22 +162,26 @@ class City(Base):
     name = models.CharField(max_length=200, db_index=True)
     display_name = models.CharField(max_length=200)
 
-    search_names = ToSearchTextField(max_length=4000,
-        db_index=INDEX_SEARCH_NAMES, blank=True, default='')
+#    search_names = ToSearchTextField(max_length=4000,
+#        db_index=INDEX_SEARCH_NAMES, blank=True, default='')
 
     latitude = models.DecimalField(max_digits=8, decimal_places=5,
         null=True, blank=True)
     longitude = models.DecimalField(max_digits=8, decimal_places=5,
         null=True, blank=True)
-    population = models.BigIntegerField(null=True, blank=True)
-    feature_class = models.CharField(max_length=1, null=True, blank=True)
-    feature_code = models.CharField(max_length=10, null=True, blank=True)
+    population = models.BigIntegerField(null=True, blank=True, db_index=True)
+    feature_class = models.CharField(max_length=1, null=True, blank=True, db_index=True)
+    feature_code = models.CharField(max_length=10, null=True, blank=True, db_index=True)
+    autocomplete_prefixes = models.ManyToManyField(City_Name_Prefix, null=True, blank=True, db_index=True)
 
-    region = models.ForeignKey(Region, blank=True, null=True)
-    country = models.ForeignKey(Country)
+    region = models.ForeignKey(Region, blank=True, null=True, db_index=True)
+    country = models.ForeignKey(Country, db_index=True)
 
     class Meta:
-        unique_together = (('region', 'name', 'feature_class', 'feature_code'),)
+        unique_together = (
+            ('country', 'region', 'name', 'feature_class', 'feature_code', 'population'),
+            ('country', 'region', 'name', 'feature_class', 'feature_code'),
+            )
         verbose_name_plural = _(u'cities')
 
     def get_display_name(self):
@@ -192,33 +200,56 @@ def city_country(sender, instance, **kwargs):
 signals.pre_save.connect(city_country, sender=City)
 
 
-def city_search_names(sender, instance, **kwargs):
-    search_names = []
-
-    country_names = [instance.country.name]
-    if instance.country.alternate_names:
-        country_names += instance.country.alternate_names.split(',')
-
-    city_names = [instance.name]
-    if instance.alternate_names:
-        city_names += instance.alternate_names.split(',')
-
+def city_autocomplete_prefixes(sender, instance, **kwargs):
+    city_name = to_search(instance.name)
+    region_name = ''
     if instance.region_id:
-        region_names = [instance.region.name]
-        if instance.region.alternate_names:
-            region_names += instance.region.alternate_names.split(',')
+        region_name = to_search(instance.region.name)
+    country_name = to_search(instance.country.name)
 
-    for city_name in city_names:
-        for country_name in country_names:
-            name = to_search(city_name + country_name)
-            if name not in search_names:
-                search_names.append(name)
+    queries = [city_name, ('%s%s' % (city_name, region_name))]
 
-            if instance.region_id:
-                for region_name in region_names:
-                    name = to_search(city_name + region_name + country_name)
-                    if name not in search_names:
-                        search_names.append(name)
+    for query_full in queries:
+        for i in range (3, len(query_full)):
+            query = query_full[:i]
+            prefix_entry = None
+            try:
+                prefix_entry = City_Name_Prefix.objects.get(prefix=query)
+            except City_Name_Prefix.DoesNotExist:
+                prefix_entry = City_Name_Prefix.objects.create(prefix=query)
+            instance.autocomplete_prefixes.add(prefix_entry)
 
-    instance.search_names = ' '.join(search_names)
-signals.pre_save.connect(city_search_names, sender=City)
+signals.pre_save.connect(city_autocomplete_prefixes, sender=City)
+
+#def city_search_names(sender, instance, **kwargs):
+#    search_names = []
+#
+#    country_names = [instance.country.name]
+#    if instance.country.alternate_names:
+#        country_names += instance.country.alternate_names.split(',')
+#
+#    city_names = [instance.name]
+#    if instance.alternate_names:
+#        city_names += instance.alternate_names.split(',')
+#
+#    if instance.region_id:
+#        region_names = [instance.region.name]
+#        if instance.region.alternate_names:
+#            region_names += instance.region.alternate_names.split(',')
+#
+#    for city_name in city_names:
+#        for country_name in country_names:
+#            name = to_search(city_name + country_name)
+#            if name not in search_names:
+#                search_names.append(name)
+#
+#            if instance.region_id:
+#                for region_name in region_names:
+#                    name = to_search(city_name + region_name + country_name)
+#                    if name not in search_names:
+#                        search_names.append(name)
+#
+#    instance.search_names = ' '.join(search_names)
+#signals.pre_save.connect(city_search_names, sender=City)
+
+

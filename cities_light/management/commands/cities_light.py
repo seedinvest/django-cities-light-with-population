@@ -337,8 +337,12 @@ It is possible to force the import of files which weren't downloaded using the
             city.feature_code = items[7]
             save = True
 
-        if save:
-            city.save()
+        if save or True:
+            try:
+                city.save()
+            except Exception as e:
+                # swallow this exception silently.
+                self.logger.debug('problably because record already exists: trouble saving city %s %s %s %s %s: %s' % (city.name, city.region, city.country, city.feature_class, city.feature_code, e))
 
     def translation_parse(self, items):
         if not hasattr(self, 'translation_data'):
