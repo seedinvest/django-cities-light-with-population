@@ -210,7 +210,7 @@ def city_autocomplete_prefixes(sender, instance, **kwargs):
     queries = [city_name, ('%s%s' % (city_name, region_name))]
 
     for query_full in queries:
-        for i in range (3, len(query_full)):
+        for i in range (3, len(query_full)+1):
             query = query_full[:i]
             prefix_entry = None
             try:

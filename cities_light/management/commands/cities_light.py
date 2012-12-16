@@ -277,20 +277,29 @@ It is possible to force the import of files which weren't downloaded using the
 
         try:
             kwargs = dict(name=force_unicode(items[1]),
+                region_id=self._get_region_id(items[8], items[10]),
                 country_id=self._get_country_id(items[8]))
         except Country.DoesNotExist:
             if self.noinsert:
                 return
             else:
                 raise
+        except Region.DoesNotExist:
+            if self.noinsert:
+                return
+            else:
+                pass
 
         try:
             city = City.objects.get(geoname_id=items[0])
         except City.DoesNotExist:
-            if self.noinsert:
-                return
+            try:
+                city = City.objects.get(**kwargs)
+            except City.DoesNotExist:
+                if self.noinsert:
+                    return
 
-            city = City(**kwargs)
+                city = City(**kwargs)
 
         save = False
         if not city.region_id:
@@ -324,7 +333,7 @@ It is possible to force the import of files which weren't downloaded using the
             city.geoname_id = items[0]
             save = True
 
-        if not city.population:
+        if not city.population or city.population < items[14]:
             city.population = items[14]
             save = True
 
@@ -336,7 +345,7 @@ It is possible to force the import of files which weren't downloaded using the
             city.feature_code = items[7]
             save = True
 
-        if save or True:
+        if save:
             try:
                 city.save()
             except Exception as e:
