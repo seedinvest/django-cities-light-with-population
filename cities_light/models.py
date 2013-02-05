@@ -219,7 +219,7 @@ def city_autocomplete_prefixes(sender, instance, **kwargs):
                 prefix_entry = City_Name_Prefix.objects.create(prefix=query)
             instance.autocomplete_prefixes.add(prefix_entry)
 
-signals.post_save.connect(city_autocomplete_prefixes, sender=City)
+#signals.post_save.connect(city_autocomplete_prefixes, sender=City)
 
 #def city_search_names(sender, instance, **kwargs):
 #    search_names = []
