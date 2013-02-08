@@ -190,6 +190,24 @@ class City(Base):
                 self.country.name)
         else:
             return u'%s, %s' % (self.name, self.country.name)
+
+    def powerset(self, s):
+        """powerset('abc') -> a b ab c ac bc abc"""
+        pairs = [(2**index, char) for index, char in enumerate(s)]
+        for index in xrange(1, 2**len(s)):
+            yield ''.join(char for mask, char in pairs if mask & index)
+
+
+    def get_power_set(self):
+        from itertools import chain
+        city_tokens = self.name.split(' ')
+        region_tokens = []
+        if self.region_id:
+            region_tokens = self.region.name.split(' ')
+        country_tokens = self.country.name.split(' ')
+        powerset = self.powerset(city_tokens + region_tokens + country_tokens)
+        return ' '.join(powerset)
+
 signals.pre_save.connect(set_name_ascii, sender=City)
 signals.pre_save.connect(set_display_name, sender=City)
 
