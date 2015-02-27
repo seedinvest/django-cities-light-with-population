@@ -55,11 +55,11 @@ admin.site.register(Region, RegionAdmin)
 
 
 class CityChangeList(ChangeList):
-    def get_query_set(self, request):
+    def get_queryset(self, request):
         if 'q' in request.GET.keys():
             request.GET = copy(request.GET)
             request.GET['q'] = to_search(request.GET['q'])
-        return super(CityChangeList, self).get_query_set(request)
+        return super(CityChangeList, self).get_queryset(request)
 
 
 class CityAdmin(admin.ModelAdmin):
