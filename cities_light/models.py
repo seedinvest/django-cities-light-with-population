@@ -6,8 +6,6 @@ from django.db.models import signals
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from south.modelsinspector import add_introspection_rules
-
 import autoslug
 
 from settings import *
@@ -140,14 +138,6 @@ class ToSearchTextField(models.TextField):
         value = super(ToSearchTextField, self).get_prep_lookup(lookup_type,
             value)
         return to_search(value)
-
-    def south_field_triple(self):
-        "Returns a suitable description of this field for South."
-        from south.modelsinspector import introspector
-        field_class = self.__class__.__module__ + "." + self.__class__.__name__
-        args, kwargs = introspector(self)
-        # That's our definition!
-        return (field_class, args, kwargs)
 
 
 class City_Name_Prefix(models.Model):
