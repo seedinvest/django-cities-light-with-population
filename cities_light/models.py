@@ -162,7 +162,7 @@ class City(Base):
     population = models.BigIntegerField(null=True, blank=True, db_index=True)
     feature_class = models.CharField(max_length=1, null=True, blank=True, db_index=True)
     feature_code = models.CharField(max_length=10, null=True, blank=True, db_index=True)
-    autocomplete_prefixes = models.ManyToManyField(City_Name_Prefix, null=True, blank=True, db_index=True)
+    autocomplete_prefixes = models.ManyToManyField(City_Name_Prefix, blank=True, db_index=True)
 
     region = models.ForeignKey(Region, blank=True, null=True, db_index=True)
     country = models.ForeignKey(Country, db_index=True)
